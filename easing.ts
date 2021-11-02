@@ -1,4 +1,4 @@
-namespace easing.curves {
+namespace ease.formula {
     // Curve formulas from https://easings.net/
     // Only "ease in" curves should appear here. "ease out" and "ease in-out" are derived programmatically from these.
     export function sine(t: number): number {
@@ -40,7 +40,7 @@ namespace easing.curves {
     }
 }
 
-namespace easing.util {
+namespace ease.util {
     export function lerp(a: number, b: number, t: number): number {
         return a + (b - a) * t;
     }
@@ -49,9 +49,8 @@ namespace easing.util {
     }
 }
 
-// Pre-defined curves for use with animation EaseFrame.
-// Choose an ease type and curve pair, like: `easing.easeIn(easing.curves.sine)`
-namespace easing {
+// Choose an ease type and curve pair, like: `ease.easeIn(ease.forumula.sine)`
+namespace ease.curves {
     export function linear(): (a: number, b: number, t: number) => number {
         return util.lerp;
     }
@@ -72,4 +71,64 @@ namespace easing {
             return util.lerp(a, b, t);
         }
     }
+}
+
+namespace ease.animation {
+    let animations: {
+        [name: string]: Animation;
+    } = {};
+
+    class Animation {
+        private startMs: number;
+        private deltaValue: number;
+        public done: boolean;
+        constructor(
+            private name: string,
+            private startValue: number,
+            private endValue: number,
+            private durationMs: number,
+            private curve: (a: number, b: number, t: number) => number,
+            private callback: (v: number) => void
+        ) {
+            this.deltaValue = this.endValue - this.startValue;
+            this.startMs = control.millis();
+        }
+
+        public update() {
+            const currMs = control.millis();
+            const deltaMs = currMs - this.startMs;
+            if (deltaMs >= this.durationMs) {
+                // Final callback for end value
+                this.callback(this.endValue);
+                this.done = true;
+            } else {
+                const pctMs = deltaMs / this.durationMs;
+                this.callback(this.startValue + this.deltaValue * pctMs)
+            }
+        }
+    }
+
+    export function animate(
+        name: string,
+        startValue: number,
+        endValue: number,
+        durationMs: number,
+        curve: (a: number, b: number, t: number) => number,
+        callback: (v: number) => void
+    ): void {
+        if (animations[name]) return;
+        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback);
+        animations[name] = anim;
+    }
+
+    game.onUpdate(() => {
+        const animNames = Object.keys(animations);
+        for (const name of animNames) {
+            const anim = animations[name];
+            anim.update();
+            if (anim.done) {
+                delete animations[name];
+            }
+        }
+    });
 }
