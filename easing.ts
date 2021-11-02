@@ -103,7 +103,8 @@ namespace ease.animation {
                 this.done = true;
             } else {
                 const pctMs = deltaMs / this.durationMs;
-                this.callback(this.startValue + this.deltaValue * pctMs)
+                const v = this.curve(this.startValue, this.endValue, pctMs);
+                this.callback(v);
             }
         }
     }
