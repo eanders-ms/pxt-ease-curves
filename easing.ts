@@ -78,9 +78,17 @@ namespace ease.animation {
         [name: string]: Animation;
     } = {};
 
+    export enum Mode {
+        OneShot = 1,
+        PingPong = 2,
+        Restart = 3
+    }
+
     class Animation {
         private startMs: number;
         private deltaValue: number;
+        private reverse: boolean;
+
         constructor(
             private name: string,
             private startValue: number,
@@ -88,10 +96,11 @@ namespace ease.animation {
             private durationMs: number,
             private curve: (a: number, b: number, t: number) => number,
             private callback: (v: number) => void,
-            private loop: boolean
+            private mode: Mode
         ) {
             this.deltaValue = this.endValue - this.startValue;
             this.startMs = control.millis();
+            this.reverse = false;
         }
 
         public update() {
@@ -99,32 +108,48 @@ namespace ease.animation {
             const deltaMs = currMs - this.startMs;
             if (deltaMs >= this.durationMs) {
                 // Final callback for end value
-                const v = this.curve(this.startValue, this.endValue, 1);
-                this.callback(v);
-                if (this.loop) {
-                    this.startMs = currMs;
-                } else {
-                    delete animations[this.name];
+                this.step(this.curve(this.startValue, this.endValue, 1));
+                switch (this.mode) {
+                    case Mode.OneShot: {
+                        delete animations[this.name];
+                        break;
+                    }
+                    case Mode.PingPong: {
+                        this.startMs = currMs;
+                        this.reverse = !this.reverse;
+                        break;
+                    }
+                    case Mode.Restart: {
+                        this.startMs = currMs;
+                        break;
+                    }
                 }
             } else {
                 const pctMs = deltaMs / this.durationMs;
-                const v = this.curve(this.startValue, this.endValue, pctMs);
+                this.step(this.curve(this.startValue, this.endValue, pctMs));
+            }
+        }
+
+        private step(v: number) {
+            if (this.reverse) {
+                this.callback(this.endValue - v);
+            } else {
                 this.callback(v);
             }
         }
     }
 
-    export function start(
+    export function animate(
         name: string,
         startValue: number,
         endValue: number,
         durationMs: number,
         curve: (a: number, b: number, t: number) => number,
         callback: (v: number) => void,
-        loop: boolean
+        mode: Mode
     ): void {
         if (animations[name]) return;
-        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback, loop);
+        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback, mode);
         animations[name] = anim;
     }
 
