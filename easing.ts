@@ -49,7 +49,7 @@ namespace ease.util {
     }
 }
 
-// Choose an ease type and curve pair, like: `ease.easeIn(ease.forumula.sine)`
+// Choose an ease type and curve pair, like: `ease.easeIn(ease.formula.sine)`
 namespace ease.curves {
     export function linear(): (a: number, b: number, t: number) => number {
         return util.lerp;
@@ -78,10 +78,10 @@ namespace ease.animation {
         [name: string]: Animation;
     } = {};
 
-    export enum Mode {
-        OneShot = 1,
-        PingPong = 2,
-        Restart = 3
+    export enum RepeatMode {
+        None = 0,
+        Reverse = 1,
+        Restart = 2
     }
 
     class Animation {
@@ -96,7 +96,7 @@ namespace ease.animation {
             private durationMs: number,
             private curve: (a: number, b: number, t: number) => number,
             private callback: (v: number) => void,
-            private mode: Mode
+            private repeatMode: RepeatMode
         ) {
             this.deltaValue = this.endValue - this.startValue;
             this.startMs = control.millis();
@@ -109,17 +109,17 @@ namespace ease.animation {
             if (deltaMs >= this.durationMs) {
                 // Final callback for end value
                 this.step(1);
-                switch (this.mode) {
-                    case Mode.OneShot: {
+                switch (this.repeatMode) {
+                    case RepeatMode.None: {
                         delete animations[this.name];
                         break;
                     }
-                    case Mode.PingPong: {
+                    case RepeatMode.Reverse: {
                         this.startMs = currMs;
                         this.reverse = !this.reverse;
                         break;
                     }
-                    case Mode.Restart: {
+                    case RepeatMode.Restart: {
                         this.startMs = currMs;
                         break;
                     }
@@ -145,10 +145,10 @@ namespace ease.animation {
         durationMs: number,
         curve: (a: number, b: number, t: number) => number,
         callback: (v: number) => void,
-        mode: Mode
+        repeatMode: RepeatMode
     ): void {
         if (animations[name]) return;
-        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback, mode);
+        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback, repeatMode);
         animations[name] = anim;
     }
 
