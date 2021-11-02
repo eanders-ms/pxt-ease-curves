@@ -1,6 +1,6 @@
 namespace ease.formula {
     // Curve formulas from https://easings.net/
-    // Only "ease in" curves should appear here. "ease out" and "ease in-out" are derived programmatically from these.
+    // Only "ease in" curves appear here. "ease out" and "ease in-out" are derived programmatically from these.
     export function sine(t: number): number {
         return 1 - Math.cos((t * Math.PI) / 2);
     }
