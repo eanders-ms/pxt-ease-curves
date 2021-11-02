@@ -96,8 +96,10 @@ namespace ease.animation {
             private durationMs: number,
             private curve: (a: number, b: number, t: number) => number,
             private callback: (v: number) => void,
-            private repeatMode: RepeatMode
+            private repeatMode: RepeatMode,
+            private onEnd?: (name: string) => void
         ) {
+            this.onEnd = onEnd || (() => { });
             this.deltaValue = this.endValue - this.startValue;
             this.startMs = control.millis();
             this.reverse = false;
@@ -112,6 +114,7 @@ namespace ease.animation {
                 switch (this.repeatMode) {
                     case RepeatMode.None: {
                         delete animations[this.name];
+                        this.onEnd(this.name);
                         break;
                     }
                     case RepeatMode.Reverse: {
@@ -145,15 +148,17 @@ namespace ease.animation {
         durationMs: number,
         curve: (a: number, b: number, t: number) => number,
         callback: (v: number) => void,
-        repeatMode: RepeatMode
+        repeatMode: RepeatMode,
+        onEnd?: (name: string) => void
     ): void {
         if (animations[name]) return;
-        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback, repeatMode);
+        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback, repeatMode, onEnd);
         animations[name] = anim;
     }
 
-    export function stop(name: string): void {
+    export function cancel(name: string): void {
         delete animations[name];
+        // Should this call onEnd handler?
     }
 
     game.onUpdate(() => {
