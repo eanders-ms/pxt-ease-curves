@@ -99,7 +99,8 @@ namespace ease.animation {
             const deltaMs = currMs - this.startMs;
             if (deltaMs >= this.durationMs) {
                 // Final callback for end value
-                this.callback(this.endValue);
+                const v = this.curve(this.startValue, this.endValue, 1);
+                this.callback(v);
                 this.done = true;
             } else {
                 const pctMs = deltaMs / this.durationMs;
