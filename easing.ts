@@ -81,14 +81,14 @@ namespace ease.animation {
     class Animation {
         private startMs: number;
         private deltaValue: number;
-        public done: boolean;
         constructor(
             private name: string,
             private startValue: number,
             private endValue: number,
             private durationMs: number,
             private curve: (a: number, b: number, t: number) => number,
-            private callback: (v: number) => void
+            private callback: (v: number) => void,
+            private loop: boolean
         ) {
             this.deltaValue = this.endValue - this.startValue;
             this.startMs = control.millis();
@@ -101,7 +101,11 @@ namespace ease.animation {
                 // Final callback for end value
                 const v = this.curve(this.startValue, this.endValue, 1);
                 this.callback(v);
-                this.done = true;
+                if (this.loop) {
+                    this.startMs = currMs;
+                } else {
+                    delete animations[this.name];
+                }
             } else {
                 const pctMs = deltaMs / this.durationMs;
                 const v = this.curve(this.startValue, this.endValue, pctMs);
@@ -110,17 +114,22 @@ namespace ease.animation {
         }
     }
 
-    export function animate(
+    export function start(
         name: string,
         startValue: number,
         endValue: number,
         durationMs: number,
         curve: (a: number, b: number, t: number) => number,
-        callback: (v: number) => void
+        callback: (v: number) => void,
+        loop: boolean
     ): void {
         if (animations[name]) return;
-        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback);
+        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback, loop);
         animations[name] = anim;
+    }
+
+    export function stop(name: string): void {
+        delete animations[name];
     }
 
     game.onUpdate(() => {
@@ -128,9 +137,6 @@ namespace ease.animation {
         for (const name of animNames) {
             const anim = animations[name];
             anim.update();
-            if (anim.done) {
-                delete animations[name];
-            }
         }
     });
 }
