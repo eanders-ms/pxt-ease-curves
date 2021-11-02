@@ -108,7 +108,7 @@ namespace ease.animation {
             const deltaMs = currMs - this.startMs;
             if (deltaMs >= this.durationMs) {
                 // Final callback for end value
-                this.step(this.curve(this.startValue, this.endValue, 1));
+                this.step(1);
                 switch (this.mode) {
                     case Mode.OneShot: {
                         delete animations[this.name];
@@ -126,16 +126,15 @@ namespace ease.animation {
                 }
             } else {
                 const pctMs = deltaMs / this.durationMs;
-                this.step(this.curve(this.startValue, this.endValue, pctMs));
+                this.step(pctMs);
             }
         }
 
-        private step(v: number) {
+        private step(t: number) {
             if (this.reverse) {
-                this.callback(this.endValue - v);
-            } else {
-                this.callback(v);
+                t = 1 - t;
             }
+            this.callback(this.curve(this.startValue, this.endValue, t));
         }
     }
 
