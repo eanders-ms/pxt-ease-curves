@@ -192,6 +192,7 @@ namespace easing {
     //% endValue.defl=1
     //% durationMs.defl=1000
     //% handlerStatement=1
+    //% blockGap=8
     export function animate(
         name: string,
         startValue: number,
