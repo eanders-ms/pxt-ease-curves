@@ -174,7 +174,7 @@ namespace ease.animation {
     });
 }
 
-namespace ease.blocks {
+namespace easing {
     export enum CurveType {
         None, Sine, Sq1, Sq2, Sq3, Sq4, Sq5, Expo, Circ, Back, Elastic
     }
@@ -191,6 +191,7 @@ namespace ease.blocks {
     //% name.defl="my anim"
     //% endValue.defl=1
     //% durationMs.defl=1000
+    //% handlerStatement=1
     export function blockAnimate(
         name: string,
         startValue: number,
@@ -199,7 +200,7 @@ namespace ease.blocks {
         curveType: CurveType,
         easeType: EaseType,
         repeatMode: ease.animation.RepeatMode,
-        callback: (v: number) => void,
+        callback: (value: number) => void,
     ): void {
         if (ease.animation.exists(name)) return;
         let curveMethod: (t: number) => number;
