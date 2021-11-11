@@ -192,7 +192,7 @@ namespace easing {
     //% endValue.defl=1
     //% durationMs.defl=1000
     //% handlerStatement=1
-    export function blockAnimate(
+    export function animate(
         name: string,
         startValue: number,
         endValue: number,
@@ -232,5 +232,11 @@ namespace easing {
             easeMethod,
             callback,
             repeatMode);
+    }
+
+    //% blockId=ease_curve_cancel
+    //% block="cancel animation with name $name"
+    export function cancel(name: string): void {
+        ease.animation.cancel(name);
     }
 }
