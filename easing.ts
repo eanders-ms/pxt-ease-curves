@@ -185,8 +185,11 @@ namespace ease.blocks {
     /**
      * Animate from start value to end value over the specified ease curve.
      */
-    //% blockId=easeAnimateCurve
-    //% block="start animation with name $name from $startValue to $endValue duration $durationMs with curve $curveType with easing $easeType with repeat $repeatType"
+    //% blockId=easeAnimateOnCurve
+    //% block="do animation with name $name from $startValue to $endValue duration $durationMs ms on curve $curveType with easing $easeType with repeat $repeatMode"
+    //% name.defl="my anim"
+    //% endValue.defl=1
+    //% duration.defl=1000
     export function blockAnimate(
         name: string,
         startValue: number,
