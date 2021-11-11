@@ -161,6 +161,10 @@ namespace ease.animation {
         // Should this call onEnd handler?
     }
 
+    export function exists(name: string): boolean {
+        return !!animations[name];
+    }
+
     game.onUpdate(() => {
         const animNames = Object.keys(animations);
         for (const name of animNames) {
@@ -168,4 +172,60 @@ namespace ease.animation {
             anim.update();
         }
     });
+}
+
+namespace ease.blocks {
+    export enum CurveType {
+        None, Sine, Sq1, Sq2, Sq3, Sq4, Sq5, Expo, Circ, Back, Elastic
+    }
+    export enum EaseType {
+        Linear, EaseIn, EaseOut, EaseInOut
+    }
+
+    /**
+     * Animate from start value to end value over the specified ease curve.
+     */
+    //% blockId=easeAnimateCurve
+    //% block="animate %name from %startValue to %endValue over %durationMs curve %curveType easing %easeType repeat %repeatType callback %callback"
+    export function blockAnimate(
+        name: string,
+        startValue: number,
+        endValue: number,
+        durationMs: number,
+        curveType: CurveType,
+        easeType: EaseType,
+        repeatMode: ease.animation.RepeatMode,
+        callback: (v: number) => void,
+    ): void {
+        if (ease.animation.exists(name)) return;
+        let curveMethod: (t: number) => number;
+        let easeMethod: (a: number, b: number, t: number) => number;
+        switch (curveType) {
+            case CurveType.Sine: curveMethod = ease.formula.sine; break;
+            case CurveType.Sq1: curveMethod = ease.formula.sq1; break;
+            case CurveType.Sq2: curveMethod = ease.formula.sq2; break;
+            case CurveType.Sq3: curveMethod = ease.formula.sq3; break;
+            case CurveType.Sq4: curveMethod = ease.formula.sq4; break;
+            case CurveType.Sq5: curveMethod = ease.formula.sq5; break;
+            case CurveType.Expo: curveMethod = ease.formula.expo; break;
+            case CurveType.Circ: curveMethod = ease.formula.circ; break;
+            case CurveType.Back: curveMethod = ease.formula.back; break;
+            case CurveType.Elastic: curveMethod = ease.formula.elastic; break;
+            default: curveMethod = (v: number) => v;
+        }
+        switch (easeType) {
+            case EaseType.Linear: easeMethod = ease.curves.linear(); break;
+            case EaseType.EaseIn: easeMethod = ease.curves.easeIn(curveMethod); break;
+            case EaseType.EaseOut: easeMethod = ease.curves.easeOut(curveMethod); break;
+            case EaseType.EaseInOut: easeMethod = ease.curves.easeInOut(curveMethod); break;
+        }
+        ease.animation.animate(
+            name,
+            startValue,
+            endValue,
+            durationMs,
+            easeMethod,
+            callback,
+            repeatMode);
+    }
 }
