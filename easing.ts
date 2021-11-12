@@ -183,7 +183,7 @@ namespace easing {
     }
 
     /**
-     * Animate from start value to end value over the specified ease curve.
+     * Interpolate from start value to end value over the specified ease curve.
      */
     //% blockId=ease_curve_interpolate
     //% block="interpolate as $name from $startValue to $endValue for $durationMs (ms) with curve $curveType and easing $easeType with repeat $repeatMode, current value $value"
@@ -235,7 +235,7 @@ namespace easing {
     }
 
     //% blockId=ease_curve_cancel
-    //% block="cancel animation with name $name"
+    //% block="cancel interpolation with name $name"
     export function cancel(name: string): void {
         ease.animation.cancel(name);
     }
