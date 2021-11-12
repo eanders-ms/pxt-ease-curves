@@ -174,7 +174,7 @@ namespace ease.animation {
     });
 }
 
-namespace easing {
+namespace EaseCurves {
     export enum CurveType {
         None, Sine, Sq1, Sq2, Sq3, Sq4, Sq5, Expo, Circ, Back, Elastic
     }
