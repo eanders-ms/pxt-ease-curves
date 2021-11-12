@@ -230,7 +230,7 @@ namespace easing.blocks {
     }
 
     //% blockId=ease_curve_cancel
-    //% block="$name: cancel interpolation"
+    //% block="$name: cancel"
     export function cancel(name: string): void {
         easing.cancel(name);
     }
