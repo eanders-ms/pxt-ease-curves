@@ -1,4 +1,10 @@
-namespace ease.formula {
+namespace easing {
+    export enum RepeatMode {
+        None = 0,
+        Reverse = 1,
+        Restart = 2
+    }
+
     // Curve formulas from https://easings.net/
     // Only "ease in" curves appear here. "ease out" and "ease in-out" are derived programmatically from these.
     export function sine(t: number): number {
@@ -38,21 +44,17 @@ namespace ease.formula {
                 ? 1
                 : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
     }
-}
 
-namespace ease.util {
     export function lerp(a: number, b: number, t: number): number {
         return a + (b - a) * t;
     }
     export function flip(t: number): number {
         return 1 - t;
     }
-}
 
-// Choose an ease type and curve pair, like: `ease.easeIn(ease.formula.sine)`
-namespace ease.curves {
+    // Choose an ease type and curve pair, like: `ease.easeIn(easing.sine)`
     export function linear(): (a: number, b: number, t: number) => number {
-        return util.lerp;
+        return lerp;
     }
     export function snap(pct: number): (a: number, b: number, t: number) => number {
         return (a, b, t) => {
@@ -60,31 +62,23 @@ namespace ease.curves {
         }
     }
     export function easeIn(fn: (t: number) => number): (a: number, b: number, t: number) => number {
-        return (a, b, t) => util.lerp(a, b, fn(t));
+        return (a, b, t) => lerp(a, b, fn(t));
     }
     export function easeOut(fn: (t: number) => number): (a: number, b: number, t: number) => number {
-        return (a, b, t) => util.lerp(a, b, util.flip(fn(util.flip(t))));
+        return (a, b, t) => lerp(a, b, flip(fn(flip(t))));
     }
     export function easeInOut(fn: (t: number) => number): (a: number, b: number, t: number) => number {
         return (a, b, t) => {
-            t = util.lerp(fn(t), util.flip(fn(util.flip(t))), t);
-            return util.lerp(a, b, t);
+            t = lerp(fn(t), flip(fn(flip(t))), t);
+            return lerp(a, b, t);
         }
     }
-}
 
-namespace ease.animation {
-    let animations: {
-        [name: string]: Animation;
+    let interpolations: {
+        [name: string]: Interpolation;
     } = {};
 
-    export enum RepeatMode {
-        None = 0,
-        Reverse = 1,
-        Restart = 2
-    }
-
-    class Animation {
+    class Interpolation {
         private startMs: number;
         private deltaValue: number;
         private reverse: boolean;
@@ -113,7 +107,7 @@ namespace ease.animation {
                 this.step(1);
                 switch (this.repeatMode) {
                     case RepeatMode.None: {
-                        delete animations[this.name];
+                        delete interpolations[this.name];
                         this.onEnd(this.name);
                         break;
                     }
@@ -141,7 +135,7 @@ namespace ease.animation {
         }
     }
 
-    export function animate(
+    export function interpolate(
         name: string,
         startValue: number,
         endValue: number,
@@ -151,30 +145,31 @@ namespace ease.animation {
         repeatMode: RepeatMode,
         onEnd?: (name: string) => void
     ): void {
-        if (animations[name]) return;
-        const anim = new Animation(name, startValue, endValue, durationMs, curve, callback, repeatMode, onEnd);
-        animations[name] = anim;
+        if (interpolations[name]) return;
+        const anim = new Interpolation(name, startValue, endValue, durationMs, curve, callback, repeatMode, onEnd);
+        interpolations[name] = anim;
     }
 
     export function cancel(name: string): void {
-        delete animations[name];
+        delete interpolations[name];
         // Should this call onEnd handler?
     }
 
     export function exists(name: string): boolean {
-        return !!animations[name];
+        return !!interpolations[name];
     }
 
     game.onUpdate(() => {
-        const animNames = Object.keys(animations);
+        const animNames = Object.keys(interpolations);
         for (const name of animNames) {
-            const anim = animations[name];
+            const anim = interpolations[name];
             anim.update();
         }
     });
 }
 
-namespace EaseCurves {
+//% block="Interpolation" color="#b02030"
+namespace easing.blocks {
     export enum CurveType {
         None, Sine, Sq1, Sq2, Sq3, Sq4, Sq5, Expo, Circ, Back, Elastic
     }
@@ -186,13 +181,13 @@ namespace EaseCurves {
      * Interpolate from start value to end value over the specified ease curve.
      */
     //% blockId=ease_curve_interpolate
-    //% block="interpolate as $name from $startValue to $endValue for $durationMs (ms) with curve $curveType and easing $easeType with repeat $repeatMode, current value $value"
+    //% block="interpolate as $name from $startValue to $endValue duration $durationMs (ms) with curve $curveType and easing $easeType with repeat $repeatMode - $value"
     //% draggableParameters="reporter"
     //% name.defl="my anim"
     //% endValue.defl=1
     //% durationMs.defl=1000
     //% handlerStatement=1
-    //% inlineInputMode="external"
+    //% inlineInputMode=external
     export function interpolate(
         name: string,
         startValue: number,
@@ -200,32 +195,31 @@ namespace EaseCurves {
         durationMs: number,
         curveType: CurveType,
         easeType: EaseType,
-        repeatMode: ease.animation.RepeatMode,
+        repeatMode: easing.RepeatMode,
         callback: (value: number) => void,
     ): void {
-        if (ease.animation.exists(name)) return;
+        if (easing.exists(name)) return;
         let curveMethod: (t: number) => number;
         let easeMethod: (a: number, b: number, t: number) => number;
         switch (curveType) {
-            case CurveType.Sine: curveMethod = ease.formula.sine; break;
-            case CurveType.Sq1: curveMethod = ease.formula.sq1; break;
-            case CurveType.Sq2: curveMethod = ease.formula.sq2; break;
-            case CurveType.Sq3: curveMethod = ease.formula.sq3; break;
-            case CurveType.Sq4: curveMethod = ease.formula.sq4; break;
-            case CurveType.Sq5: curveMethod = ease.formula.sq5; break;
-            case CurveType.Expo: curveMethod = ease.formula.expo; break;
-            case CurveType.Circ: curveMethod = ease.formula.circ; break;
-            case CurveType.Back: curveMethod = ease.formula.back; break;
-            case CurveType.Elastic: curveMethod = ease.formula.elastic; break;
-            default: curveMethod = (v: number) => v;
+            case CurveType.Sine: curveMethod = easing.sine; break;
+            case CurveType.Sq1: curveMethod = easing.sq1; break;
+            case CurveType.Sq2: curveMethod = easing.sq2; break;
+            case CurveType.Sq3: curveMethod = easing.sq3; break;
+            case CurveType.Sq4: curveMethod = easing.sq4; break;
+            case CurveType.Sq5: curveMethod = easing.sq5; break;
+            case CurveType.Expo: curveMethod = easing.expo; break;
+            case CurveType.Circ: curveMethod = easing.circ; break;
+            case CurveType.Back: curveMethod = easing.back; break;
+            case CurveType.Elastic: curveMethod = easing.elastic; break;
         }
         switch (easeType) {
-            case EaseType.Linear: easeMethod = ease.curves.linear(); break;
-            case EaseType.EaseIn: easeMethod = ease.curves.easeIn(curveMethod); break;
-            case EaseType.EaseOut: easeMethod = ease.curves.easeOut(curveMethod); break;
-            case EaseType.EaseInOut: easeMethod = ease.curves.easeInOut(curveMethod); break;
+            case EaseType.Linear: easeMethod = easing.linear(); break;
+            case EaseType.EaseIn: easeMethod = easing.easeIn(curveMethod); break;
+            case EaseType.EaseOut: easeMethod = easing.easeOut(curveMethod); break;
+            case EaseType.EaseInOut: easeMethod = easing.easeInOut(curveMethod); break;
         }
-        ease.animation.animate(
+        easing.interpolate(
             name,
             startValue,
             endValue,
@@ -238,6 +232,6 @@ namespace EaseCurves {
     //% blockId=ease_curve_cancel
     //% block="cancel interpolation $name"
     export function cancel(name: string): void {
-        ease.animation.cancel(name);
+        easing.cancel(name);
     }
 }
