@@ -192,7 +192,7 @@ namespace easing {
     //% endValue.defl=1
     //% durationMs.defl=1000
     //% handlerStatement=1
-    //% inlineInputMode=external
+    //% inlineInputMode="external"
     export function interpolate(
         name: string,
         startValue: number,
