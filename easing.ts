@@ -181,7 +181,7 @@ namespace easing.blocks {
      * Interpolate from start value to end value over the specified ease curve.
      */
     //% blockId=ease_curve_interpolate
-    //% block="interpolate as $name from $startValue to $endValue duration $durationMs (ms) with curve $curveType and easing $easeType with repeat $repeatMode - $value"
+    //% block="$name: interpolate $value from $startValue to $endValue for $durationMs (ms) with curve $curveType and easing $easeType repeat $repeatMode"
     //% draggableParameters="reporter"
     //% name.defl="my anim"
     //% endValue.defl=1
@@ -230,7 +230,7 @@ namespace easing.blocks {
     }
 
     //% blockId=ease_curve_cancel
-    //% block="cancel interpolation $name"
+    //% block="$name: cancel interpolation"
     export function cancel(name: string): void {
         easing.cancel(name);
     }
