@@ -168,7 +168,7 @@ namespace easing {
     });
 }
 
-//% block="Interpolation" color="#b02030"
+//% block="Interpolation" color="#00565b"
 namespace easing.blocks {
     export enum CurveType {
         None, Sine, Sq1, Sq2, Sq3, Sq4, Sq5, Expo, Circ, Back, Elastic
