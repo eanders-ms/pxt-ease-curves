@@ -185,15 +185,14 @@ namespace easing {
     /**
      * Animate from start value to end value over the specified ease curve.
      */
-    //% blockId=ease_curve_animate
-    //% block="do animation with name $name from $startValue to $endValue duration (ms) $durationMs on curve $curveType with easing $easeType with repeat $repeatMode, current value $v"
+    //% blockId=ease_curve_interpolate
+    //% block="interpolate as $name from $startValue to $endValue for $durationMs (ms) with curve $curveType and easing $easeType with repeat $repeatMode, current value $value"
     //% draggableParameters="reporter"
     //% name.defl="my anim"
     //% endValue.defl=1
     //% durationMs.defl=1000
     //% handlerStatement=1
-    //% blockGap=8
-    export function animate(
+    export function interpolate(
         name: string,
         startValue: number,
         endValue: number,
