@@ -236,7 +236,7 @@ namespace easing {
     }
 
     //% blockId=ease_curve_cancel
-    //% block="cancel interpolation with name $name"
+    //% block="cancel interpolation $name"
     export function cancel(name: string): void {
         ease.animation.cancel(name);
     }
