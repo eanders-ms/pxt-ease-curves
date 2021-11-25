@@ -195,8 +195,7 @@ namespace easing.blocks {
         curveType: CurveType,
         easeType: EaseType,
         repeatMode: easing.RepeatMode,
-        callback: (value: number) => void,
-        onEnd: () => void
+        callback: (value: number) => void
     ): void {
         if (easing.exists(name)) return;
         let curveMethod: (t: number) => number;
@@ -226,8 +225,7 @@ namespace easing.blocks {
             durationMs,
             easeMethod,
             callback,
-            repeatMode,
-            onEnd);
+            repeatMode);
     }
 
     //% blockId=ease_curve_cancel
