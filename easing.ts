@@ -248,6 +248,8 @@ namespace easing.blocks {
     //% blockId=ease_curve_on_complete
     //% block="$name: on complete"
     //% name.defl="my anim"
+    //% handlerStatement=1
+    //% inlineInputMode=external
     export function onComplete(name: string, callback: () => void): void {
         easing.onComplete(name, callback);
     }
