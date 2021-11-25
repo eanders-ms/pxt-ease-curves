@@ -127,6 +127,10 @@ namespace easing {
             }
         }
 
+        public onComplete(callback: () => void) {
+            this.onEnd = callback;
+        }
+
         private step(t: number) {
             if (this.reverse) {
                 t = 1 - t;
@@ -156,6 +160,12 @@ namespace easing {
 
     export function exists(name: string): boolean {
         return !!interpolations[name];
+    }
+
+    export function onComplete(name: string, callback: () => void): void {
+        if (interpolations[name]) {
+            interpolations[name].onComplete(callback);
+        }
     }
 
     game.onUpdate(() => {
@@ -233,5 +243,12 @@ namespace easing.blocks {
     //% name.defl="my anim"
     export function cancel(name: string): void {
         easing.cancel(name);
+    }
+
+    //% blockId=ease_curve_on_complete
+    //% block="$name: on complete"
+    //% name.defl="my anim"
+    export function onComplete(name: string, callback: () => void): void {
+        easing.onComplete(name, callback);
     }
 }
