@@ -230,6 +230,7 @@ namespace easing.blocks {
 
     //% blockId=ease_curve_cancel
     //% block="$name: cancel"
+    //% name.defl="my anim"
     export function cancel(name: string): void {
         easing.cancel(name);
     }
