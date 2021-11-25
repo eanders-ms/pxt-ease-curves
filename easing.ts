@@ -152,7 +152,6 @@ namespace easing {
 
     export function cancel(name: string): void {
         delete interpolations[name];
-        // Should this call onEnd handler?
     }
 
     export function exists(name: string): boolean {
@@ -197,6 +196,7 @@ namespace easing.blocks {
         easeType: EaseType,
         repeatMode: easing.RepeatMode,
         callback: (value: number) => void,
+        onEnd: () => void
     ): void {
         if (easing.exists(name)) return;
         let curveMethod: (t: number) => number;
@@ -226,7 +226,8 @@ namespace easing.blocks {
             durationMs,
             easeMethod,
             callback,
-            repeatMode);
+            repeatMode,
+            onEnd);
     }
 
     //% blockId=ease_curve_cancel
